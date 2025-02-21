@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: example-job
+  namespace: default
+  labels:
+    app: example
+  annotations:
+    description: "A comprehensive job example with multiple parameters."
+spec:
+  completions: 3                # The Job will complete successfully when 3 Pods finish successfully.
+  parallelism: 2                # At most 2 Pods will run concurrently.
+  #activeDeadlineSeconds: 10    # The Job must finish within 600 seconds (10 minutes) or it will be terminated.
+  backoffLimit: 4               # Maximum number of retries for failed Pods is 4.
+  completionMode: NonIndexed    # Tracks completions by simply counting successful Pods.
+  suspend: false                # The Job is not suspended; it will start running immediately.
+  ttlSecondsAfterFinished: 100  # After completion, the Job object will be eligible for cleanup after 300 seconds.
+  template:
+    metadata:
+      labels:
+        app: example
+    spec:
+      restartPolicy: OnFailure  # Pods will restart only on failure.
+      containers:
+      - name: example-container
+        image: busybox
+        command: ["sh", "-c", "echo 'Job started'; sleep 60; echo 'Job finished'"]
+

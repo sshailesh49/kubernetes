@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: example-cronjob
+  labels:
+    app: cron-example
+spec:
+  schedule: "*/2 * * * *"               # Runs every 5 minutes
+  concurrencyPolicy: Forbid             # Do not allow concurrent runs
+  startingDeadlineSeconds: 60           # Must start within 60 seconds of scheduled time
+  successfulJobsHistoryLimit: 3         # Retain last 3 successful jobs
+  failedJobsHistoryLimit: 1             # Retain last 1 failed job
+  jobTemplate:
+    spec:
+      completions: 1                    # Job completes when one pod finishes successfully
+      parallelism: 1                    # Only one pod at a time
+      backoffLimit: 4                   # Retry 4 times if job fails
+      template:
+        spec:
+          restartPolicy: OnFailure      # Restart pod on failure
+          containers:
+          - name: example
+            image: busybox
+            command: ["sh", "-c", "echo 'Hello, Kubernetes CronJob!'; sleep 10"]
+
